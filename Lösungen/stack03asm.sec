@@ -1,0 +1,163 @@
+%include "asm_io.inc"
+segment .text
+    global asm_main
+
+asm_main:
+    enter 0,0
+    pusha
+    
+    mov eax, 3
+    push eax
+    
+    call calc
+    add esp, 4
+
+    call print_int
+    call print_nl
+
+    ; Geben Sie den Stack direkt vor dem popa Befehl an. Stack 3
+
+    popa
+    mov eax, 0
+    leave
+    ret
+    
+calc:
+; Geben Sie mittels einer mathematischen Vorschrift an, was die Funktion
+; calc berechnet.
+; f(x) = 2*x +f(x-1) falls x>1
+; f(x) = 1 falls x =1
+;
+    enter 4,0 ; lokale Variable fuer Ergebnissicherung
+              ; kein likale Variable , um das Ergebnis zu speichern
+    pusha
+    
+    ; Geben Sie den Stack immer direkt vor dem mov Befehl an. Stack 1
+    ; Korrigieren Sie aber zuerst den Fehler.
+
+    mov ebx, [ebp+8] ; Parameter in ebx
+    
+    ;Basecase
+    mov eax, 1      
+    cmp eax, ebx
+    je end_calc
+    
+    ; Rekursionsvorschrift
+    mov eax, ebx
+    sub eax, 1
+    
+    push eax
+    call calc
+    add esp, 4
+
+    ; Geben Sie den Stack an dieser Stelle einmalig bei der Rückkehr aus calc(1) an.
+
+    shl ebx, 1
+    add eax, ebx
+    ;Berechnung beendet
+    
+end_calc:
+
+   ;add esp , 4
+   ;dieser Befehl ist falsch ,weil das wird in leave gemacht und muss nicht 
+   ;hier geschrieben werden
+
+    mov [ebp-4], eax
+    popa
+    mov eax, [ebp-4]
+    leave
+    ret
+
+; Vor Rückkeher calc(3)
+
+; Rücksprungadresse (zu c)
+; gesicherter ebp
+; gesicherte Register
+; 3 (push eax)
+; Rücksprungadresse (zu asm_main)
+; gesicherter ebp   <- aktuller ebp
+; lokale Variable
+; gesicherte Register <- aktuller esp
+
+
+
+;calc(2)
+
+; Rücksprungadresse (zu c)
+; gesicherter ebp
+; gesicherte Register
+; 3 (push eax)
+; Rücksprungadresse (zu asm_main)
+; gesicherter ebp   
+; lokale Variable
+; gesicherte Register
+; 2 (push eax) 
+; Rücksprungadresse (zu calc(3))
+; gesicherter ebp   <- aktuller ebp
+; lokale Variable
+; gesicherte Register  <- aktuller esp
+
+
+
+;calc (1)
+
+; Rücksprungadresse (zu c)
+; gesicherter ebp
+; gesicherte Register
+; 3 (push eax)
+; Rücksprungadresse (zu asm_main)
+; gesicherter ebp   
+; lokale Variable
+; gesicherte Register
+; 2 (push eax) 
+; Rücksprungadresse (zu calc(3))
+; gesicherter ebp   
+; lokale Variable
+; gesicherte Register  
+; 1 (push eax) 
+; Rücksprungadresse (zu calc(2))
+; gesicherter ebp   <- aktuller ebp
+; lokale Variable
+; gesicherte Register  <- aktuller esp
+
+
+
+
+; nach Rückkeher von calc(1) 
+
+; Rücksprungadresse (zu c)
+; gesicherter ebp
+; gesicherte Register
+; 3 (push eax)
+; Rücksprungadresse (zu asm_main)
+; gesicherter ebp   
+; lokale Variable
+; gesicherte Register
+; 2 (push eax) 
+; Rücksprungadresse (zu calc(3))
+; gesicherter ebp   <- aktuller ebp
+; lokale Variable
+; gesicherte Register  <- aktuller esp
+
+
+
+; nach Rückkeher von calc(2)
+
+; Rücksprungadresse (zu c)
+; gesicherter ebp
+; gesicherte Register
+; 3 (push eax)
+; Rücksprungadresse (zu asm_main)
+; gesicherter ebp   <- aktuller ebp
+; lokale Variable
+; gesicherte Register <- aktuller esp
+
+
+
+; nach Rückkeher von calc(3)
+
+; Rücksprungadresse (zu c)
+; gesicherter ebp  <- aktuller ebp
+; gesicherte Register <- aktuller esp
+
+

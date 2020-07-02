@@ -1,0 +1,49 @@
+%include "asm_io.inc"
+;
+segment .data;
+
+segment .bss
+
+segment .text
+        global  asm_main
+asm_main:
+        enter   0,0               
+        pusha
+
+        call read_int
+        push eax
+
+	call read_int
+	push edx
+
+        call potenz_rekursive
+        
+        call print_int
+      
+        call print_nl
+        pop ecx
+	pop edx
+        popa
+        mov     eax, 1            ; return back to C
+        leave                     
+        ret
+
+potenz_rekursive:
+    enter 4,0
+    pusha
+    mov edx,[ebp+8]
+    cmp edx,0
+    je end_rek
+    sub edx ,1
+    push edx
+    call potenz_rekursive
+    pop edx
+    imul ecx, [ebp+8]
+
+end_rek:
+    
+    mov [ebp-4],eax
+    popa
+    mov eax,[ebp-4]
+    leave
+    ret

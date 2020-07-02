@@ -1,0 +1,26 @@
+%include "asm_io.inc"
+;
+segment .data;
+
+segment .bss
+
+segment .text
+        global  asm_main
+        extern puts
+asm_main:
+        enter   0,0               
+        pusha
+  
+        mov eax, 56
+        push eax
+        call puts
+
+        pop ecx
+
+        call print_nl
+       
+        popa
+        mov     eax, 0            ; return back to C
+        leave                     
+        ret
+
